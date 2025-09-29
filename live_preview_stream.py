@@ -39,7 +39,7 @@ DEFAULT_MODE = "camera"
 
 client = genai.Client(
     http_options={"api_version": "v1beta"},
-    api_key="AIzaSyCbOgHy0OyUgluC5-Q0P9vL90_zJl2hYRU",
+    api_key="YOUR_GEMINI_API_KEY",  # or set the environment variable: export GENAI_API_KEY="YOUR_GEM
 )
 
 

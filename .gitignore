@@ -3,8 +3,13 @@
 
 # Env
 .env
+*.env
+nodejs-api/.env
+react-front/.env
 
-# Node / React
+
+# Node / React (any depth)
+
 **/node_modules/
 **/.cache/
 **/build/
@@ -14,3 +19,5 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+

@@ -18,6 +18,11 @@ export default function App() {
   const audioQueueRef = useRef([]);
   const isModelSpeakingRef = useRef(false);
 
+  // --- NEW: Refs for audio nodes to manage disconnection ---
+  const audioProcessorRef = useRef(null);
+  const audioSourceRef = useRef(null);
+
+
   // Live session state
   const [session, setSession] = useState(null);
   const [audioCtx, setAudioCtx] = useState(null);
@@ -151,6 +156,12 @@ export default function App() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const src = ctx.createMediaStreamSource(stream);
     const proc = ctx.createScriptProcessor(4096, 1, 1);
+
+    // --- MODIFICATION: Store nodes in refs ---
+    audioSourceRef.current = src;
+    audioProcessorRef.current = proc;
+
+
     src.connect(proc);
     proc.connect(ctx.destination);
 
@@ -168,23 +179,40 @@ export default function App() {
     };
   };
 
+  // --- MODIFIED `stopLive` FUNCTION ---
   const stopLive = async () => {
+    // 1. Disconnect the audio processor to stop sending data
+    if (audioProcessorRef.current && audioSourceRef.current) {
+        audioSourceRef.current.disconnect(audioProcessorRef.current);
+        audioProcessorRef.current.disconnect();
+        audioProcessorRef.current.onaudioprocess = null; // Remove the handler
+        audioProcessorRef.current = null;
+        audioSourceRef.current = null;
+    }
+      
+    // 2. Stop the microphone tracks
     if (micStream) {
       micStream.getTracks().forEach((t) => t.stop());
       setMicStream(null);
     }
+      
+    // 3. Now, safely close the session
     if (session) {
       try {
         await session.close?.();
       } catch {}
       setSession(null);
     }
+      
+    // 4. Clean up the audio context
     if (audioCtx) {
       try {
         await audioCtx.close();
       } catch {}
       setAudioCtx(null);
     }
+      
+    // 5. Reset states
     audioQueueRef.current = [];
     isModelSpeakingRef.current = false;
     setIsModelSpeaking(false);

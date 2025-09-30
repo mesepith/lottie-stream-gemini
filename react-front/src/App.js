@@ -138,13 +138,18 @@ export default function App() {
       model: MODEL,
       config: {
         responseModalities: ["AUDIO"],
-        inputAudioTranscription: {}, // Enable user transcription
+        // --- MODIFIED: Add language codes for user input ---
+        inputAudioTranscription: {
+          speechConfig: {
+            languageCodes: ["en-US", "es-ES", "hi-IN"], // Add all languages you want to support
+          },
+        },
         outputAudioTranscription: {}, // Enable AI transcription
         speechConfig: {
-          languageCode: "en-US", // Consistent with prompt's accent instruction
+          languageCode: "en-US",
           voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
         },
-        systemInstruction: instruction, // <--- CORRECT
+        systemInstruction: instruction,
       },
       callbacks: {
        onmessage: (msg) => {

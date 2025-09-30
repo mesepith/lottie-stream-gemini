@@ -12,6 +12,7 @@ const OUTPUT_SAMPLE_RATE = 24000;
 
 export default function App() {
   const avatarRef = useRef(null);
+  const transcriptContainerRef = useRef(null); // Ref for the transcript container
 
   // SOLUTION: Refs to hold mutable data for our audio queue and speaking state
   // without causing unnecessary re-renders in callbacks.
@@ -30,12 +31,24 @@ export default function App() {
   // SOLUTION: This state's primary role is to trigger UI re-renders (avatar, text).
   const [isModelSpeaking, setIsModelSpeaking] = useState(false);
 
+  // --- MODIFIED: State for transcriptions ---
+  const [transcript, setTranscript] = useState([]);
+
+
   // Start/stop avatar based on speaking flag
   useEffect(() => {
     if (!avatarRef.current) return;
     if (isModelSpeaking) avatarRef.current.play();
     else avatarRef.current.stop();
   }, [isModelSpeaking]);
+
+  // Auto-scroll transcript to the bottom
+  useEffect(() => {
+    if (transcriptContainerRef.current) {
+      transcriptContainerRef.current.scrollTop = transcriptContainerRef.current.scrollHeight;
+    }
+  }, [transcript]);
+
 
   // ---------- helpers: audio conversions (Unchanged) ----------
 
@@ -125,6 +138,8 @@ export default function App() {
       model: MODEL,
       config: {
         responseModalities: ["AUDIO"],
+        inputAudioTranscription: {}, // Enable user transcription
+        outputAudioTranscription: {}, // Enable AI transcription
         speechConfig: {
           languageCode: "en-US", // Consistent with prompt's accent instruction
           voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
@@ -132,19 +147,53 @@ export default function App() {
         systemInstruction: instruction, // <--- CORRECT
       },
       callbacks: {
-        onmessage: (msg) => {
-          const base64Audio = msg?.speechUpdate?.audio || msg?.data || null;
-          let audioChunk = null;
-          if (typeof base64Audio === "string") {
-            audioChunk = base64ToInt16(base64Audio);
-          } else if (base64Audio instanceof ArrayBuffer) {
-            audioChunk = new Int16Array(base64Audio);
-          }
-          if (audioChunk) {
-            audioQueueRef.current.push(audioChunk);
-            processAudioQueue();
-          }
-        },
+       onmessage: (msg) => {
+        const base64Audio = msg?.speechUpdate?.audio || msg?.data || null;
+        let audioChunk = null;
+        if (typeof base64Audio === "string") {
+        audioChunk = base64ToInt16(base64Audio);
+        } else if (base64Audio instanceof ArrayBuffer) {
+        audioChunk = new Int16Array(base64Audio);
+        }
+        if (audioChunk) {
+        audioQueueRef.current.push(audioChunk);
+        processAudioQueue();
+        }
+
+        // --- FIXED: Handle sequential transcriptions ---
+        const { inputTranscription, outputTranscription } = msg.serverContent || {};
+
+        if (inputTranscription?.text || outputTranscription?.text) {
+            setTranscript(currentTranscript => {
+                const nextTranscript = [...currentTranscript];
+                const lastEntry = nextTranscript.length > 0 ? nextTranscript[nextTranscript.length - 1] : null;
+
+                if (inputTranscription?.text) {
+                    // User transcription provides the full text of an utterance.
+                    // A new utterance begins if the last one was from the AI, or if the previous user utterance was marked as final.
+                    if (lastEntry && lastEntry.speaker === 'User' && !lastEntry.isFinal) {
+                        // Update the existing non-final user utterance
+                        nextTranscript[nextTranscript.length - 1] = { ...lastEntry, text: inputTranscription.text, isFinal: inputTranscription.isFinal };
+                    } else {
+                        // Add a new entry for the user
+                        nextTranscript.push({ speaker: 'User', text: inputTranscription.text, isFinal: inputTranscription.isFinal });
+                    }
+                } else if (outputTranscription?.text) {
+                    // AI transcription provides chunks that need to be concatenated.
+                    // A new utterance begins if the last speaker was the user.
+                    if (lastEntry && lastEntry.speaker === 'AI') {
+                        // Append to the existing AI utterance
+                        nextTranscript[nextTranscript.length - 1] = { ...lastEntry, text: lastEntry.text + outputTranscription.text };
+                    } else {
+                        // Start a new AI utterance
+                        nextTranscript.push({ speaker: 'AI', text: outputTranscription.text });
+                    }
+                }
+                
+                return nextTranscript;
+            });
+        }
+      },
         onerror: (e) => console.error("Live error:", e),
         onclose: () => console.log("Live session closed"),
       },
@@ -216,6 +265,7 @@ export default function App() {
     audioQueueRef.current = [];
     isModelSpeakingRef.current = false;
     setIsModelSpeaking(false);
+    setTranscript([]);
   };
 
   const sendText = async (text) => {
@@ -247,6 +297,28 @@ export default function App() {
             <button onClick={stopLive}>Stop</button>
           </>
         )}
+      </div>
+       {/* --- NEW: Display transcriptions --- */}
+       <div 
+        ref={transcriptContainerRef}
+        className="transcripts" 
+        style={{ 
+          marginTop: 20, 
+          textAlign: 'left', 
+          width: '100%', 
+          maxWidth: 500,
+          maxHeight: 200, // Set a max height
+          overflowY: 'auto', // Enable vertical scrolling
+          border: '1px solid #ccc',
+          padding: 10,
+          borderRadius: 8
+        }}
+       >
+        {transcript.map((item, index) => (
+          <p key={index} style={{margin: '8px 0'}}>
+            <strong>{item.speaker}:</strong> {item.text}
+          </p>
+        ))}
       </div>
       <p style={{ opacity: 0.7, marginTop: 8 }}>
         {session

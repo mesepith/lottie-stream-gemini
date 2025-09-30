@@ -146,7 +146,7 @@ export default function App() {
         },
         outputAudioTranscription: {}, // Enable AI transcription
         speechConfig: {
-          languageCode: "en-US",
+          languageCode: "es-ES",
           voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } },
         },
         systemInstruction: instruction,

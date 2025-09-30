@@ -174,11 +174,15 @@ export default function App() {
                 const lastEntry = nextTranscript.length > 0 ? nextTranscript[nextTranscript.length - 1] : null;
 
                 if (inputTranscription?.text) {
-                    // User transcription provides the full text of an utterance.
+                    // User transcription provides chunks of text.
                     // A new utterance begins if the last one was from the AI, or if the previous user utterance was marked as final.
                     if (lastEntry && lastEntry.speaker === 'User' && !lastEntry.isFinal) {
-                        // Update the existing non-final user utterance
-                        nextTranscript[nextTranscript.length - 1] = { ...lastEntry, text: inputTranscription.text, isFinal: inputTranscription.isFinal };
+                        // Append to the existing non-final user utterance
+                        nextTranscript[nextTranscript.length - 1] = { 
+                            ...lastEntry, 
+                            text: lastEntry.text + ' ' + inputTranscription.text, 
+                            isFinal: inputTranscription.isFinal 
+                        };
                     } else {
                         // Add a new entry for the user
                         nextTranscript.push({ speaker: 'User', text: inputTranscription.text, isFinal: inputTranscription.isFinal });

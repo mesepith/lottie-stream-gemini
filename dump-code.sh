@@ -49,6 +49,7 @@ find . \
       -path "*/api-keys/.DS_Store" -o \
       -path "./dump-code.sh" -o \
       -name "*.command" -o \
+      -name "live_preview_stream.py" -o \
       -path "./.gitignore" -o \
       -path "./client/.gitignore" -o \
       -path "./client/.env.production" -o \

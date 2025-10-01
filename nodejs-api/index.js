@@ -80,7 +80,7 @@ app.get('/api/ephemeral-token', async (_req, res) => {
     // --- CONSTRUCT THE INSTRUCTION STRING ---
     const instruction = createInstruction(wordList, helperWords); // Use the imported function
 
-    console.log("Generated Instruction:", instruction);
+    // console.log("Generated Instruction:", instruction);
 
     // --- CREATE TOKEN (WITHOUT a systemInstruction) ---
     const token = await ai.authTokens.create({

@@ -20,4 +20,7 @@ __pycache__/
 *.pyc
 .DS_Store
 
+code_dump_*.html
+code_dump_*.txt
+
 

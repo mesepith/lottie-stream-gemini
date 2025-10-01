@@ -37,7 +37,7 @@ EOF
 
 # Find allowed files (exclude sensitive/ignored, previous dumps, and this script)
 find . \
-  -type d \( -name node_modules -o -name .git -o -path "./client/public" -o -path "./client/src/assets" -o -path "./server/api-keys" \) -prune -o \
+  -type d \( -name node_modules -o -name .git -o -name __pycache__  -o -path "./client/public" -o -path "./client/build" -o -path "./client/src/assets" -o -path "./server/api-keys" \) -prune -o \
   -type f \( \
       -name "package-lock.json" -o \
       -name ".env" -o \
@@ -56,10 +56,18 @@ find . \
       -path "./client/README.md" -o \
       -path "./client/eslint.config.js" -o \
       -path "./client/index.html" -o \
-      -path "./client/package.json" -o \
       -path "./client/vite.config.js" -o \
       -path "./client/src/index.css" -o \
+      -path "./client/src/App.css" -o \
+      -path "./client/src/index.js" -o \
+      -path "./client/src/App.test.js" -o \
+      -path "./client/src/logo.svg" -o \
+      -path "./client/src/reportWebVitals.js" -o \
+      -path "./client/src/talking-avatar.json" -o \
+      -path "./client/src/talking-avatar1.json" -o \
+      -path "./client/src/talking-avatar2.json" -o \
       -path "./client/src/main.jsx" -o \
+      -path "./client/src/setupTests.js" -o \
       -path "./client/src/assets/react.svg" -o \
       -path "./client/public/favicon.ico" -o \
       -path "./client/public/vite.svg" \

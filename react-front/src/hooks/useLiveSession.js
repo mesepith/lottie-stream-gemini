@@ -82,7 +82,7 @@ export function useLiveSession({ onTranscriptUpdate }) {
           responseModalities: ['AUDIO'],
           inputAudioTranscription: {
             speechConfig: {
-              languageCodes: ['en-US', 'es-ES', 'hi-IN'],
+              languageCodes: ['es-ES'],
             },
           },
           outputAudioTranscription: {},

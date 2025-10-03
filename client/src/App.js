@@ -1,4 +1,4 @@
-// src/App.js
+// src/App.js : Main application component for the Talking AI Avatar
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Lottie from 'lottie-react';
 import talkingAvatar from './talking-avatar.json';

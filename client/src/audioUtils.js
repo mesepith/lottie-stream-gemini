@@ -12,6 +12,9 @@ export function floatTo16BitPCM(float32) {
   return out;
 }
 
+/**
+ * @Desc: Downsamples a Float32Array audio buffer to 16kHz
+ */
 export function downsampleTo16k(float32, inRate) {
   const outRate = 16000;
   if (inRate === outRate) return float32;

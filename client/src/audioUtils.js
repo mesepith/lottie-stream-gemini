@@ -1,5 +1,8 @@
 // src/audioUtils.js
 
+/*
+  * Utility functions for audio processing
+*/
 export function floatTo16BitPCM(float32) {
   const out = new Int16Array(float32.length);
   for (let i = 0; i < float32.length; i++) {

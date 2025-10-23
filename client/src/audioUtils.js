@@ -1,6 +1,7 @@
 // src/audioUtils.js
 
 /*
+  * @author: Zahir
   * Utility functions for audio processing
 */
 export function floatTo16BitPCM(float32) {

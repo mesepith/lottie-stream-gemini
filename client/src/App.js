@@ -12,6 +12,7 @@ export default function App() {
 
   /*
   @author: Zahir
+  @Desc: Handles updates to the transcript state based on incoming transcriptions
   */
   const handleTranscriptUpdate = useCallback(
     ({ inputTranscription, outputTranscription }) => {

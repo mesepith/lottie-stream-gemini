@@ -10,6 +10,9 @@ export default function App() {
 
   const [transcript, setTranscript] = useState([]);
 
+  /*
+  @author: Zahir
+  */
   const handleTranscriptUpdate = useCallback(
     ({ inputTranscription, outputTranscription }) => {
       setTranscript((currentTranscript) => {

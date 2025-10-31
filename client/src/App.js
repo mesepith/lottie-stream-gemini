@@ -76,6 +76,9 @@ export default function App() {
     }
   }, [transcript]);
 
+  /**
+   * @author: Zahir
+   */
   const handleStop = () => {
     stopSession();
     setTranscript([]); // Clear transcript on stop
